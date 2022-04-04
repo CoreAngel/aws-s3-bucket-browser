@@ -73,7 +73,8 @@
           <b-button v-for="(breadcrump, index) in pathBreadcrumps" v-bind:key="breadcrump.url" 
             type="is-primary" rounded
             tag="a" 
-            :href="onHref(breadcrump.url)" 
+            :href="breadcrump.url"
+            @click="clearSearch()"
             icon-pack="fas"
             :icon-left="index == 0 ? 'folder' : ''"
             target=""
@@ -133,8 +134,8 @@
               <b-button 
                 type="is-text" rounded 
                 tag="a" 
-                :href="onHref(props.row.type === 'content' ? props.row.url : `#${props.row.prefix}`)"               
-                @click="document.activeElement.blur()"
+                :href="props.row.type === 'content' ? props.row.url : `#${props.row.prefix}`" 
+                @click="clearSearch()"              
                 style="text-align: left; white-space: pre-wrap;"
                 >
                 <template>{{ props.row.name }}</template>
@@ -144,7 +145,8 @@
                 v-if="props.row.installUrl"
                 type="is-primary" rounded outlined
                 tag="a" 
-                :href="onHref(props.row.installUrl)"  
+                :href="props.row.installUrl"
+                @click="clearSearch()"
                 class="name-column-install-button"
                 >
                 Install
@@ -238,7 +240,7 @@
     
     <!-- Footer --> 
     <div class="footer-bucket-url">
-      <a :href="onHref(`${config.bucketUrl}?prefix=${config.rootPrefix}${pathPrefix}`)">Bucket: {{ config.bucketUrl }}</a>
+      <a :href="`${config.bucketUrl}?prefix=${config.rootPrefix}${pathPrefix}`" @click="clearSearch()">Bucket: {{ config.bucketUrl }}</a>
     </div>
   </div>
   <!-- GitHub Corner -->
@@ -383,9 +385,8 @@
           this.search = value
           this.refresh()
         },
-        onHref(link) {
+        clearSearch() {
           this.search = ''
-          return link;
         },
         previousPage() {
           if (this.previousContinuationTokens.length > 0) {
