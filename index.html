@@ -105,7 +105,7 @@
         </div>
       </div>
       <b-field label="Search...">
-        <b-input v-model="search" v-on:input="refresh"></b-input>
+        <b-input :value="search" v-on:input="onInput"></b-input>
       </b-field>
       
       <!-- Content Table --> 
@@ -379,6 +379,10 @@
       },
       methods: {
         moment,
+        onInput(value) {
+          this.search = value
+          this.refresh()
+        },
         onHref(link) {
           this.search = ''
           return link;
@@ -386,7 +390,6 @@
         previousPage() {
           if (this.previousContinuationTokens.length > 0) {
             this.continuationToken = this.previousContinuationTokens.pop()
-            this.search = ''
             this.refresh()
           }
         },
@@ -394,7 +397,6 @@
           if (this.nextContinuationToken) {
             this.previousContinuationTokens.push(this.continuationToken)
             this.continuationToken = this.nextContinuationToken
-            this.search = ''
             this.refresh()
           }
         },
