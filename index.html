@@ -386,7 +386,8 @@
           this.refresh()
         },
         clearSearch() {
-          this.search = ''
+          document.activeElement.blur();
+          this.search = '';
         },
         previousPage() {
           if (this.previousContinuationTokens.length > 0) {
