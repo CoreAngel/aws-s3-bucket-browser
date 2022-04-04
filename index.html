@@ -65,7 +65,6 @@
         </div>
       </div>
     </div>
-
     <div class="container">
       <!-- Navigation Bar -->
       <div class="container is-clearfix">
@@ -74,7 +73,7 @@
           <b-button v-for="(breadcrump, index) in pathBreadcrumps" v-bind:key="breadcrump.url" 
             type="is-primary" rounded
             tag="a" 
-            :href="breadcrump.url" 
+            :href="onHref(breadcrump.url)" 
             icon-pack="fas"
             :icon-left="index == 0 ? 'folder' : ''"
             target=""
@@ -105,7 +104,10 @@
           </b-button>
         </div>
       </div>
-
+      <b-field label="Search...">
+        <b-input v-model="search" v-on:input="refresh"></b-input>
+      </b-field>
+      
       <!-- Content Table --> 
       <b-table 
         :data="pathContentTableData"
@@ -131,7 +133,7 @@
               <b-button 
                 type="is-text" rounded 
                 tag="a" 
-                :href="props.row.type === 'content' ? props.row.url : `#${props.row.prefix}`"               
+                :href="onHref(props.row.type === 'content' ? props.row.url : `#${props.row.prefix}`)"               
                 @click="document.activeElement.blur()"
                 style="text-align: left; white-space: pre-wrap;"
                 >
@@ -142,7 +144,7 @@
                 v-if="props.row.installUrl"
                 type="is-primary" rounded outlined
                 tag="a" 
-                :href="props.row.installUrl"  
+                :href="onHref(props.row.installUrl)"  
                 class="name-column-install-button"
                 >
                 Install
@@ -236,7 +238,7 @@
     
     <!-- Footer --> 
     <div class="footer-bucket-url">
-      <a :href="`${config.bucketUrl}?prefix=${config.rootPrefix}${pathPrefix}`">Bucket: {{ config.bucketUrl }}</a>
+      <a :href="onHref(`${config.bucketUrl}?prefix=${config.rootPrefix}${pathPrefix}`)">Bucket: {{ config.bucketUrl }}</a>
     </div>
   </div>
   <!-- GitHub Corner -->
@@ -341,6 +343,7 @@
       data: {
         config, // defined in <head> section
         pathPrefix: '',
+        search: '',
         pathContentTableData: [],
 
         previousContinuationTokens: [],
@@ -376,9 +379,14 @@
       },
       methods: {
         moment,
+        onHref(link) {
+          this.search = ''
+          return link;
+        },
         previousPage() {
           if (this.previousContinuationTokens.length > 0) {
             this.continuationToken = this.previousContinuationTokens.pop()
+            this.search = ''
             this.refresh()
           }
         },
@@ -386,6 +394,7 @@
           if (this.nextContinuationToken) {
             this.previousContinuationTokens.push(this.continuationToken)
             this.continuationToken = this.nextContinuationToken
+            this.search = ''
             this.refresh()
           }
         },
@@ -398,7 +407,7 @@
 
             let bucketListApiUrl = `${config.bucketUrl}?list-type=2`
             bucketListApiUrl += `&delimiter=/`
-            let bucketPrefix = `${config.rootPrefix}${this.pathPrefix}`
+            let bucketPrefix = `${config.rootPrefix}${this.pathPrefix}${this.search}`
             bucketListApiUrl += `&prefix=${bucketPrefix}`
 
             if (config.pageSize) {
